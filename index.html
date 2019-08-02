@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+     history
+        class Router {
+            constructor ({routes}) {
+                this.router = routes//参数赋值
+                this.bindClick()//默认调用
+                this.init()//默认调用
+            }
+            init () {
+                window.addEventListener('popstate',this.updateView.bind(this))  //popState重要事件
+            }
+            updateView () {
+                let content = document.getElementById('content'); //获取节点
+                let Res = window.location.pathname;   //将url路径中pathname  赋值
+                content.innerHTML = this.router.filter(item => item.path === Res)[0].component   //参数遍历找到则将其component赋值于内容     
+            }
+            bindClick () {
+                let pushA = document.querySelectorAll('a');  //获取节点
+                [].forEach.call(pushA,(item) => { //将节点遍历改变this指向   
+                    item.addEventListener('click', () => {   //点击每个
+                        let Res = item.getAttribute('data-to')  //获得自动属性
+                        window.history.pushState({}, null, Res)    //重要方法  window.history.pushState  ({传的一些东西},{页面显示title||null},路由)
+                        console.log('history',window.history)
+                        this.updateView()   //调用
+                    })
+                })
+            }
+        }
+        new Router({   //实例传参
+            routes: [  //自己配置参数
+                {
+                    path: '/',
+                    component: '主页'
+                },
+                {
+                    path: '/home',
+                    component: 'home'
+                },
+                {
+                    path: '/index',
+                    component: 'index'
+                },
+            ]
+        })
+
+        hash
+            class Router {  //class
+            constructor ({routes}) {   
+                this.routes = routes
+                this.everyPath = {}                  //默认给予一个对象
+                this.init ()
+                this.routes.forEach( (item) => {    //先把参数遍历一次，得到每一项  再另外给予之前的一个对象  用item.path为一个下标  给予一个函数里面赋值一个内容
+                    this.everyPath[item.path] = function () {
+                        document.getElementById('content').innerHTML = item.component
+                    }
+                })
+            }
+            init () {
+                window.addEventListener('load',this.updataLocation.bind(this))
+                window.addEventListener('hashchange',this.updataLocation.bind(this))   //改变this指向
+            }
+            updataLocation () {
+                let pathRes = window.location.hash.slice(1);   //获取到window.location.hash  再给予一个值 为了好调用
+                this.everyPath[pathRes]()
+                console.log(this.everyPath)
+            }
+        }
+        new Router({   //实例传参
+            routes: [  //自己配置参数
+                {
+                    path: '/',
+                    component: '主页'
+                },
+                {
+                    path: '/home',
+                    component: 'home'
+                },
+                {
+                    path: '/index',
+                    component: 'index'
+                },
+            ]
+        })
+    </script>
+</body>
+</html>
